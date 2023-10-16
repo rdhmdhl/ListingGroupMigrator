@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 # load env variables
 load_dotenv()
 
-def send_email(file_name, email_subject, email_body):
+def send_email(file_name=None, email_subject="", email_body=""):
     from_email = os.getenv("EMAIL_ADDRESS")
     to_email = os.getenv("TO_EMAIL_ADDRESS")
     email_password = os.getenv("EMAIL_PASSWORD")
@@ -25,12 +25,13 @@ def send_email(file_name, email_subject, email_body):
         # Add body to email
         body = email_body
         msg.attach(MIMEText(body, 'plain'))
-
-        # Attach the file
-        with open(file_name, 'rb') as file:
-            attach_file = MIMEApplication(file.read(), Name=file_name)
-        attach_file['Content-Disposition'] = f'attachment; filename={file_name}'
-        msg.attach(attach_file)
+        
+        if file_name:
+            # Attach the file
+            with open(file_name, 'rb') as file:
+                attach_file = MIMEApplication(file.read(), Name=file_name)
+            attach_file['Content-Disposition'] = f'attachment; filename={file_name}'
+            msg.attach(attach_file)
 
         # Connect to Gmail's SMTP server
         server = smtplib.SMTP('smtp.gmail.com', 587)

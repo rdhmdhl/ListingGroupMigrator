@@ -2,6 +2,7 @@ from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 from fetch_product_info import get_product_info as get_product_info_main
 import datetime
+from email_sender import send_email
 
 def fetch_existing_listing_groups(client, customer_id):
     try:
@@ -17,7 +18,6 @@ def fetch_existing_listing_groups(client, customer_id):
             asset_group.id,
             asset_group.name,
             asset_group_listing_group_filter.resource_name,
-            asset_group_listing_group_filter.case_value.product_type.value,
             asset_group_listing_group_filter.case_value.product_item_id.value,
             campaign.id,
             campaign.name,
@@ -25,13 +25,17 @@ def fetch_existing_listing_groups(client, customer_id):
             metrics.conversions_value
         FROM asset_group_product_group_view
         WHERE campaign.name LIKE '%PMax:%'
+        AND campaign.name NOT LIKE '%Low Performing%'
         AND metrics.cost_micros > 1000000000
         AND metrics.conversions_value < 7000000000
         AND segments.date BETWEEN '{start_date}' AND '{end_date}'
+        AND asset_group_listing_group_filter.case_value.product_item_id.value IS NOT NULL
         """
         
         # Execute the query
         response = ga_service.search(customer_id=customer_id, query=query)
+        # initialize email body variable
+        email_body = ""
 
         # Process the response
         for row in response:
@@ -44,20 +48,28 @@ def fetch_existing_listing_groups(client, customer_id):
             # Calculate and round ROAS to 2 decimal places
             roas = round(row.metrics.conversions_value / real_cost, 2)
 
+
             if real_cost != 0:
                 if roas < 7:
-                    print(f"Found listing group with resource name: {row.asset_group_listing_group_filter.resource_name}, "
-                        f"of asset group name {row.asset_group.name}, "
-                        f"and campaign name {row.campaign.name}, "
-                        f"cost of ${real_cost} dollars, "
-                        f"and a conversion value of ${conversion_value}, "
-                        f"and ROAS of ${roas},")
-                    
                     # Get product information for this listing group
                     asset_group_id = row.asset_group.id
                     resource_name = row.asset_group_listing_group_filter.resource_name
-                    get_product_info_main(client, customer_id, asset_group_id, resource_name)
-                    
-                    
+
+                    filter_status = get_product_info_main(client, customer_id, asset_group_id, resource_name)
+
+                    if filter_status == 'UNIT_INCLUDED':
+                        email_body += (
+                            f"Campaign -- {row.campaign.name},"
+                            f" with asset group name {row.asset_group.name}, "
+                            f"has a product: {row.asset_group_listing_group_filter.case_value.product_item_id.value}, "
+                            f"that has spent ${real_cost} in the last 15 days, "
+                            f"with a conversion value of ${conversion_value}, "
+                            f"and ROAS of ${roas}. \n"
+                            f"\n")
+                        
+        # Send email once the loop is finished
+        if email_body:  # only send if email_body is not empty
+            send_email(None, "Listing groups with ROAS < $7 found", email_body)
+
     except GoogleAdsException as ex:
         print(f"An error occurred: {ex}")
