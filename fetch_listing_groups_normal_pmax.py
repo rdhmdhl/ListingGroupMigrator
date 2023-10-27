@@ -25,9 +25,8 @@ def fetch_existing_listing_groups(client, customer_id):
             metrics.conversions_value
         FROM asset_group_product_group_view
         WHERE campaign.name LIKE '%PMax:%'
-        AND campaign.name NOT LIKE '%Low Performing%'
-        AND metrics.cost_micros > 1000000000
-        AND metrics.conversions_value < 7000000000
+        AND campaign.id = {20510025794}
+        AND metrics.cost_micros > 2000000000
         AND segments.date BETWEEN '{start_date}' AND '{end_date}'
         AND asset_group_listing_group_filter.case_value.product_item_id.value IS NOT NULL
         """

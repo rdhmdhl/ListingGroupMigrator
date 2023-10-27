@@ -11,7 +11,7 @@ load_dotenv()
 
 def send_email(file_name=None, email_subject="", email_body=""):
     from_email = os.getenv("EMAIL_ADDRESS")
-    to_email = os.getenv("TO_EMAIL_ADDRESS")
+    to_emails = os.getenv("TO_EMAIL_ADDRESSES").split(",")  # Split comma-separated string into list
     email_password = os.getenv("EMAIL_PASSWORD")
     subject = email_subject
 
@@ -19,7 +19,7 @@ def send_email(file_name=None, email_subject="", email_body=""):
         # Create a multipart message
         msg = MIMEMultipart()
         msg['From'] = from_email
-        msg['To'] = to_email
+        msg['To'] = ", ".join(to_emails)  # This should be a string
         msg['Subject'] = subject
 
         # Add body to email
@@ -41,7 +41,7 @@ def send_email(file_name=None, email_subject="", email_body=""):
         server.login(from_email, email_password)
 
         # Send email
-        server.sendmail(from_email, to_email, msg.as_string())
+        server.sendmail(from_email, to_emails, msg.as_string())
         
         # Disconnect
         server.quit()
