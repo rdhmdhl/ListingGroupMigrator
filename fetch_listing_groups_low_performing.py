@@ -20,6 +20,7 @@ def fetch_existing_listing_groups(client, customer_id):
             asset_group.resource_name,
             asset_group.name,
             asset_group_listing_group_filter.resource_name,
+            asset_group_listing_group_filter.parent_listing_group_filter,
             asset_group_listing_group_filter.case_value.product_item_id.value,
             campaign.id,
             campaign.name,
@@ -61,9 +62,15 @@ def fetch_existing_listing_groups(client, customer_id):
 
                     filter_status = get_product_info_main(client, customer_id, asset_group_id, filter_resource_name)
 
+                    product_id = row.asset_group_listing_group_filter.case_value.product_item_id.value
+
+                    parent_listing_group_filter_resource_name = row.asset_group_listing_group_filter.parent_listing_group_filter
+
                     if filter_status == 'UNIT_INCLUDED':
-                        # remove listing group filter, and create a new one that has "unit_removed"
-                        success = exclude_listing_group_main(client, customer_id, filter_resource_name, asset_group_resource_name)
+
+                        print(f"calling exlude listing group now...")
+                        # remove listing group filter, and create a new one that has "unit_excluded"
+                        success = exclude_listing_group_main(client, customer_id, filter_resource_name, asset_group_resource_name, product_id, parent_listing_group_filter_resource_name)
 
                         if success:
                             email_body += (
@@ -75,7 +82,8 @@ def fetch_existing_listing_groups(client, customer_id):
                                 f"and ROAS of ${roas}. \n"
                                 f"This listing group has been excluded! \n"
                                 f"\n")
-                            
+                            print(f"sucess!")         
+                        
         # Send email once the loop is finished
         if email_body:  # only send if email_body is not empty
             send_email(None, "Listing groups with ROAS < $4 found in low-performing campaign", email_body)

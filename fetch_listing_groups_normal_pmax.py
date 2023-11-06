@@ -1,6 +1,7 @@
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 from fetch_product_info import get_product_info as get_product_info_main
+from exclude_listing_group import exclude_listing_group as exclude_listing_group_main
 import datetime
 from email_sender import send_email
 
@@ -18,6 +19,7 @@ def fetch_existing_listing_groups(client, customer_id):
             asset_group.id,
             asset_group.name,
             asset_group_listing_group_filter.resource_name,
+            asset_group_listing_group_filter.parent_listing_group_filter,
             asset_group_listing_group_filter.case_value.product_item_id.value,
             campaign.id,
             campaign.name,
@@ -52,23 +54,39 @@ def fetch_existing_listing_groups(client, customer_id):
                 if roas < 7:
                     # Get product information for this listing group
                     asset_group_id = row.asset_group.id
-                    resource_name = row.asset_group_listing_group_filter.resource_name
+                    # filter resource name
+                    filter_resource_name = row.asset_group_listing_group_filter.resource_name
+                    # asset group resource name
+                    asset_group_resource_name = row.asset_group.resource_name
 
-                    filter_status = get_product_info_main(client, customer_id, asset_group_id, resource_name)
+                    filter_status = get_product_info_main(client, customer_id, asset_group_id, filter_resource_name)
+
+                    product_id = row.asset_group_listing_group_filter.case_value.product_item_id.value
+
+                    parent_listing_group_filter_resource_name = row.asset_group_listing_group_filter.parent_listing_group_filter
 
                     if filter_status == 'UNIT_INCLUDED':
-                        email_body += (
-                            f"Campaign -- {row.campaign.name},"
-                            f" with asset group name {row.asset_group.name}, "
-                            f"has a product: {row.asset_group_listing_group_filter.case_value.product_item_id.value}, "
-                            f"that has spent ${real_cost} in the last 15 days, "
-                            f"with a conversion value of ${conversion_value}, "
-                            f"and ROAS of ${roas}. \n"
-                            f"\n")
+                        print(f"calling exclude listing groups now...")
+                        # remove listing group filter, and create a new one with "unit_excluded"
+                        success = exclude_listing_group_main(client, customer_id, filter_resource_name, asset_group_resource_name, product_id, parent_listing_group_filter_resource_name)
+
+                        if success:
+                            email_body += (
+                                f"Campaign -- {row.campaign.name},"
+                                f" with asset group name {row.asset_group.name}, "
+                                f"has a product: {row.asset_group_listing_group_filter.case_value.product_item_id.value}, "
+                                f"that has spent ${real_cost} in the last 15 days, "
+                                f"with a conversion value of ${conversion_value}, "
+                                f"and ROAS of ${roas}. \n"
+                                f"This listing group has been excluded! \n"
+                                f"\n")
+                            print(f"success!")
                         
         # Send email once the loop is finished
         if email_body:  # only send if email_body is not empty
-            send_email(None, "Listing groups with ROAS < $7 found", email_body)
+            send_email(None, "Listing groups with ROAS < $7 found in PMax: Shopping ads (United States)", email_body)
+        else:
+            print(f"no listing groups found that meet the criteria :)")
 
     except GoogleAdsException as ex:
         print(f"An error occurred: {ex}")
