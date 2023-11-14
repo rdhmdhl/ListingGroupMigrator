@@ -11,7 +11,7 @@ def fetch_existing_listing_groups(client, customer_id):
 
         # Calculate the last 30 days
         end_date = datetime.date.today()
-        start_date = end_date - datetime.timedelta(days=15)
+        start_date = end_date - datetime.timedelta(days=30)
 
         # Create the query
         query = f"""
@@ -29,7 +29,7 @@ def fetch_existing_listing_groups(client, customer_id):
         FROM asset_group_product_group_view
         WHERE campaign.name LIKE '%PMax:%'
         AND campaign.id = {20520625833}
-        AND metrics.cost_micros >= 500000000
+        AND metrics.cost_micros >= 1000000000
         AND segments.date BETWEEN '{start_date}' AND '{end_date}'
         AND asset_group_listing_group_filter.case_value.product_item_id.value IS NOT NULL
         """
@@ -77,16 +77,18 @@ def fetch_existing_listing_groups(client, customer_id):
                                 f"Campaign -- {row.campaign.name},"
                                 f" with asset group name {row.asset_group.name}, "
                                 f"has a product: {row.asset_group_listing_group_filter.case_value.product_item_id.value}, "
-                                f"that has spent ${real_cost} in the last 15 days, "
+                                f"that has spent ${real_cost} in the last 30 days, "
                                 f"with a conversion value of ${conversion_value}, "
                                 f"and ROAS of ${roas}. \n"
                                 f"This listing group has been excluded! \n"
                                 f"\n")
-                            print(f"sucess!")         
+                            print(f"sucess! excluded listing group: ", row.asset_group_listing_group_filter.case_value.product_item_id.value)    
                         
         # Send email once the loop is finished
         if email_body:  # only send if email_body is not empty
             send_email(None, "Listing groups with ROAS < $4 found in low-performing campaign", email_body)
+        else:
+            print(f"no listing groups found that meet the criteria :)")
 
     except GoogleAdsException as ex:
         print(f"An error occurred: {ex}")
