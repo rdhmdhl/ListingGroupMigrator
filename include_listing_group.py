@@ -15,7 +15,6 @@ def include_listing_group(client, customer_id, campaign_id, product_id):
         bool: True if the operation was successful, False otherwise. Used to determine if product was successfully included
     """
 
-
     # initialize an array to store our information
     operations = []
     googleads_service = client.get_service("GoogleAdsService")

@@ -13,7 +13,6 @@ def exclude_listing_group(client, customer_id, filter_resource_name, asset_group
     operations.append(remove_operation)
  
     # Create the new exclusion filter 
-    # with the temporary ID as its parent
     create_operation = client.get_type("MutateOperation")
     create = create_operation.asset_group_listing_group_filter_operation.create
     # excluding product from asset group :)

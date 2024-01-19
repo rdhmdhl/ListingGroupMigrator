@@ -110,7 +110,7 @@ def fetch_existing_listing_groups(client, customer_id):
                     
         # Send email once the loop is finished
         if email_body:  # only send if email_body is not empty
-            send_email(None, "Listing groups with ROAS < $4 found in low-performing campaign", email_body)
+            send_email(None, "Sony | Listing groups updated in low-performing PMax Campaign", email_body)
         else:
             print(f"no listing groups found that meet the criteria :)")
 

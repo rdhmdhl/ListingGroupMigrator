@@ -1,13 +1,17 @@
 import json
 import boto3
 import os
-import yaml
 from botocore.exceptions import ClientError
 from google.ads.googleads.client import GoogleAdsClient
+import os
+from dotenv import load_dotenv
+# load env variables
+load_dotenv()
 
+# grab secret from AWS secrets manager, or another secure provider
 def get_secret():
-    secret_name = "prod/google-ads-api"
-    region_name = "us-west-1"
+    secret_name = os.getenv('SECRET_NAME')
+    region_name = os.getenv('REGION_NAME')
 
     session = boto3.session.Session()
     client = session.client(
