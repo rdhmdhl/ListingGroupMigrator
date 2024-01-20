@@ -9,14 +9,14 @@ Sony needed a solution to move products/listing groups between campaigns based o
 - Access to Google Ads account
 - Gmail account for sending notifications (optional)
 
-# Usage
+## Usage
 Use the email_sender file to send an email on what the program does! This is configured for a gmail address, using the gmail SMTP server. 
 
 Customize the query to pull in different metrics, in order to include/exclude or move listings between PMax campaigns. 
 
 In order to include or exclude a product, the listing group filter must be removed and created again. Ensure that it's being created with the correct parameters. 
 
-## How to use
+## How to Use
 1. [Obtain a developer token](https://developers.google.com/google-ads/shopping/full-automation/articles/t11#obtain_a_developer_token)
 2. [Choose a client library](https://developers.google.com/google-ads/shopping/full-automation/articles/t11#choose_a_client_library)
 3. [Set up OAuth2](https://developers.google.com/google-ads/shopping/full-automation/articles/t11#set_up_oauth2)
