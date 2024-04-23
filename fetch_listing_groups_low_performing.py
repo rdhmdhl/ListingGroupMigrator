@@ -62,13 +62,17 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
             # filter status for the product within the low-performing pmax campaign, PASSING GENERIC ASSET GROUP TO FILTER NOT IN
             normal_camp_product_status = get_listing_group_status(client, customer_id, normal_pmax_campaign_id, product_id, main_pmax_generic_asset_group_resource_name)
 
+            asset_group_listing_group_resource_name = row.asset_group_listing_group_filter.resource_name
+
+            asset_group_name = row.asset_group.name
+            
             if roas < 4:
                 print(f"filter status is {low_perf_camp_product_status} for product id {product_id} within the low-performing pmax campaign, and ROAS is ${roas}\n")
                 # check if the product is included in the low-performing campaign
                 if low_perf_camp_product_status == 'UNIT_INCLUDED':
                     # remove listing group filter, and create a new one with "unit_excluded"
                     print(f"excluding {product_id} from low-performing pmax campaign becuase ROAS is ${roas}\n")
-                    excluded = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name)
+                    excluded = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name, asset_group_listing_group_resource_name)
                     
                     if excluded:
                         email_body += (
@@ -77,23 +81,14 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                             f"has a product: {product_id}, "
                             f"that has spent ${real_cost} in the last 30 days, "
                             f"with a conversion value of ${conversion_value}, "
-                            f"and ROAS of ${roas}."
+                            f"and ROAS of ${roas}. "
                             f"This listing group has been excluded! \n"
                             f"\n")
                         print(f"sucess! excluded listing group: {product_id} in the following campaign {row.campaign.name} and asset group {row.asset_group.name}")   
                         print('\n')
                 elif low_perf_camp_product_status == 'UNIT_EXCLUDED': 
-                    print("listing group was already excluded in the low-performing pmax campaign.")
-                    email_body += (
-                        f"Campaign -- {row.campaign.name},"
-                        f" with asset group name {row.asset_group.name}, "
-                        f"has a product: {product_id}, "
-                        f"that has spent ${real_cost} in the last 30 days, "
-                        f"with a conversion value of ${conversion_value}, "
-                        f"and ROAS of ${roas}."
-                        f"This listing group {product_id} was already excluded in the low-performing pmax campaign -- no actions taken.\n"
-                        f"\n"
-                        )
+                    print("listing group already excluded within the low-performing pmax campaign. no further actions taken.")
+                    
                     
                 elif low_perf_camp_product_status not in ('UNIT_INCLUDED', 'UNIT_EXCLUDED'):
                     print("listing group status was not found in low-performing campaign.")
@@ -104,7 +99,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                         f"that has spent ${real_cost} in the last 30 days, "
                         f"with a conversion value of ${conversion_value}, "
                         f"and ROAS of ${roas}."
-                        f"listing group {product_id} status was not found in the low-performing pmax campaign -- no actions taken.\n"
+                        f"listing group {product_id} status was not found in the low-performing pmax campaign. This likely means it does not exist yet. No actions taken.\n"
                         f"\n"
                         )
 
@@ -115,7 +110,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                 if normal_camp_product_status == 'UNIT_EXCLUDED':
                     print(f"including {product_id} in main pmax campaign, because ROAS is ${roas} within the low-performing campaign. the product is currently excluded within the main pmax campaign. \n")
                     # include in main pmax campaign
-                    added_to_normal_pmax = include_listing_group_main(client, customer_id, normal_pmax_campaign_id, product_id, main_pmax_generic_asset_group_resource_name)
+                    added_to_normal_pmax = include_listing_group_main(client, customer_id, normal_pmax_campaign_id, product_id, main_pmax_generic_asset_group_resource_name,asset_group_name)
 
                     # ensure product was added to normal pmax, and the product status
                     # within the low-performing campaign is 'unit included' before excluding
@@ -133,7 +128,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
 
                         # exclude the listing group within the low performing pmax campaign if included
                         if low_perf_camp_product_status == 'UNIT_INCLUDED':
-                            exclusion_complete = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name)
+                            exclusion_complete = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name, asset_group_listing_group_resource_name)
 
                             if exclusion_complete:
                                 email_body += (
@@ -158,11 +153,11 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                         email_body += (f"Listing group {product_id} was not successfully added to the main pmax campaign. \n")
                 
                 elif normal_camp_product_status == 'UNIT_INCLUDED':
-                    print("listing group was already included in the main pmax campaign. checking if it's already included within the low-performing campaign now...")
+                    print("listing group was already included in the main pmax campaign. checking if it's already included within the low-performing campaign now...\n")
                     # exclude the low performing pmax campaign
                     if low_perf_camp_product_status == 'UNIT_INCLUDED':
                         print("listing group is currently included within the low-performing campaign, excluding now...")
-                        exclusion_complete = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name)
+                        exclusion_complete = exclude_listing_group_main(client, customer_id, low_performing_campaign_id, product_id, low_performing_generic_asset_group_resource_name, asset_group_listing_group_resource_name)
 
                         if exclusion_complete:
                             print(f"exclusion completed within the low-performing campaign. \n")
@@ -190,8 +185,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                                 )
 
                     elif low_perf_camp_product_status == 'UNIT_EXCLUDED': 
-                        print("listing group was already excluded in the low-performing campaign")
-                        email_body += (f"Listing group {product_id} was already excluded in the low-performing campaign (${roas} ROAS), and already included within the main pmax campaign. no actions taken.\n")
+                        print("listing group already excluded within the low-performing pmax campaign. no further actions taken.")
 
                 elif normal_camp_product_status not in ('UNIT_EXCLUDED', 'UNIT_INCLUDED'):
                     print("listing group was not found within the main pmax campaign. it likely needs to be created.. no action taken.")

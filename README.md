@@ -16,6 +16,8 @@ Customize the query to pull in different metrics, in order to include/exclude or
 
 In order to include or exclude a product, the listing group filter must be removed and created again. Ensure that it's being created with the correct parameters. 
 
+The include file relies on asset group strings to be the same. Ideally we wouldn't have to rely on this because the could potentially be adjusted in the Google Ads platform. In the future we will pull asset group IDs dynamically and match them across both campaigns. 
+
 ## How to Use
 1. [Obtain a developer token](https://developers.google.com/google-ads/shopping/full-automation/articles/t11#obtain_a_developer_token)
 2. [Choose a client library](https://developers.google.com/google-ads/shopping/full-automation/articles/t11#choose_a_client_library)
