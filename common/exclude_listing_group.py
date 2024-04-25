@@ -67,10 +67,12 @@ def fetch_asset_group_resource_name(client, customer_id, campaign_id, product_id
     query = f"""
     SELECT
         asset_group.name,
+        asset_group.status,
         asset_group.resource_name,
         asset_group_listing_group_filter.parent_listing_group_filter
     FROM asset_group_product_group_view
     WHERE campaign.id = {campaign_id}
+    AND asset_group.status = 'ENABLED'
     AND asset_group_listing_group_filter.case_value.product_item_id.value = '{product_id}'
     AND asset_group_listing_group_filter.resource_name = '{existing_listing_group_filter_resource_name}'
     AND asset_group.resource_name NOT IN ('{generic_asset_group_resource_name}')
@@ -88,11 +90,13 @@ def fetch_existing_filter_details(client, customer_id, campaign_id, product_id, 
     ga_service = client.get_service("GoogleAdsService")
     query = f"""
     SELECT    
+        asset_group.status,
         asset_group_listing_group_filter.resource_name,
         asset_group_listing_group_filter.parent_listing_group_filter,
         asset_group_listing_group_filter.case_value.product_item_id.value
     FROM asset_group_product_group_view
     WHERE campaign.id = {campaign_id}
+    AND asset_group.status = 'ENABLED'
     AND asset_group_listing_group_filter.case_value.product_item_id.value = '{product_id}'
     AND asset_group_listing_group_filter.resource_name = '{existing_listing_group_filter_resource_name}'
     AND asset_group.resource_name NOT IN ('{generic_asset_group_resource_name}')

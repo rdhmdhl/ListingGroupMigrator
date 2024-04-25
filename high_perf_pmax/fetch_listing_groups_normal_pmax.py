@@ -64,7 +64,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
 
             asset_group_name = row.asset_group.name
 
-            if roas < 7:
+            if roas < 6.50:
                 print(f"filter status is {normal_camp_product_status} for product id {product_id} within the main pmax campaign, and ROAS is ${roas}\n")
                 # if included within the main pmax campaign, move forward to exclude
                 if normal_camp_product_status == 'UNIT_INCLUDED':
@@ -160,7 +160,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                             f"This listing group status was not found within the main pmax campaign. This likely means it does not exist yet. No actions taken. \n"
                             f"\n")
             # do nothing if roas is meeting the goal
-            elif roas >= 7:
+            elif roas >= 6.50:
                 print(f"product {product_id} found, but roas is >= $7. no actions taken.")
                         
         # Send email once the loop is finished

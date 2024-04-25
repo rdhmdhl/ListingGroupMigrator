@@ -104,7 +104,7 @@ def fetch_existing_listing_groups(client, customer_id, to_emails):
                         )
 
             # if roas is greater than or equal to $4, include in main campaign, exclude in low performing
-            if roas >= 7:
+            if roas >= 6.50:
                 # CHECK IF THE LISTING GROUP FILTER STATUS IS INCLUDED within the MAIN CAMPAIGN
                 # if it's excluded, create a new filter with the status "included"
                 if normal_camp_product_status == 'UNIT_EXCLUDED':

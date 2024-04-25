@@ -32,7 +32,13 @@ def include_listing_group(client, customer_id, campaign_id, product_id, generic_
 
     # When you add a new node (product group), you need to specify where in the hierarchy it should be placed. This is done by linking it to its parent node. The parent_listing_group_filter_resource_name ensures that your new node is correctly positioned in the hierarchy. Removing a node could remove all it's child nodes as well without understanding this hierarchy.
     existing_filter_resource_name, parent_listing_group_filter_resource_name = fetch_existing_filter_details(client, customer_id, campaign_id, product_id, generic_asset_group_resource_name, asset_group_name)
-
+    if not existing_filter_resource_name:
+        print(f"no existing filter resource name found")
+        return False
+    if not parent_listing_group_filter_resource_name:
+        print(f"no parent listing group filter resource found.")
+        return False
+    
     # check to see if there is a filter for this product already, if so, proceed with the inclusion
     if existing_filter_resource_name and parent_listing_group_filter_resource_name:
         print("adding to the asset group... ", asset_group_name)
@@ -72,9 +78,11 @@ def fetch_asset_group_resource_name(client, customer_id, campaign_id, product_id
     query = f"""
     SELECT
         asset_group.name,
-        asset_group.resource_name
+        asset_group.resource_name,
+        asset_group.status
     FROM asset_group_product_group_view
     WHERE campaign.id = {campaign_id}
+    AND asset_group.status = 'ENABLED'
     AND asset_group.name LIKE '%{asset_group_name}%'
     AND asset_group_listing_group_filter.case_value.product_item_id.value = '{product_id}'
     AND asset_group.resource_name NOT IN ('{generic_asset_group_resource_name}')
@@ -94,11 +102,13 @@ def fetch_existing_filter_details(client, customer_id, campaign_id, product_id, 
     query = f"""
     SELECT    
         asset_group.resource_name,
+        asset_group.status,
         asset_group_listing_group_filter.resource_name,
         asset_group_listing_group_filter.parent_listing_group_filter,
         asset_group_listing_group_filter.case_value.product_item_id.value
     FROM asset_group_product_group_view
     WHERE campaign.id = {campaign_id}
+    AND asset_group.status = 'ENABLED'
     AND asset_group.name LIKE '%{asset_group_name}%'
     AND asset_group_listing_group_filter.case_value.product_item_id.value = '{product_id}'
     AND asset_group.resource_name NOT IN ('{generic_asset_group_resource_name}')
