@@ -1,5 +1,4 @@
 from google.ads.googleads.errors import GoogleAdsException
-from fetch_and_print_product_tree import fetch_and_print_partition_tree
 def include_listing_group(client, customer_id, campaign_id, product_id, generic_asset_group_resource_name, asset_group_name):
     """
     Includes a product in a listing group of a specified campaign. Used for moving products from the normal pmax campaign, to the low-performing pmax campaign, or vice versa

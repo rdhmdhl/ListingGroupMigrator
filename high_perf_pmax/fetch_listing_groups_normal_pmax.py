@@ -1,10 +1,10 @@
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
-from fetch_listing_group_status import get_listing_group_status as get_listing_group_status
-from exclude_listing_group import exclude_listing_group as exclude_listing_group_main
-from include_listing_group import include_listing_group as include_listing_group_main
+from common.fetch_listing_group_status import get_listing_group_status as get_listing_group_status
+from common.exclude_listing_group import exclude_listing_group as exclude_listing_group_main
+from common.include_listing_group import include_listing_group as include_listing_group_main
 import datetime
-from email_sender import send_email
+from common.email_sender import send_email
 
 def fetch_existing_listing_groups(client, customer_id, to_emails):
     try:
