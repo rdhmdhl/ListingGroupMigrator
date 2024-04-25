@@ -1,7 +1,6 @@
 import smtplib
 import traceback
 import sys
-import json
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
