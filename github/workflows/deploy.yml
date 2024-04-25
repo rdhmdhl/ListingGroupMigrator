@@ -3,6 +3,7 @@ name: Deploy Lambda Functions
 on:
   push:
     branches:
+      - test
       - main
     paths:
       - 'high_perf_pmax/**'
