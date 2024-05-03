@@ -41,7 +41,7 @@ jobs:
         aws_region: 'us-west-1' 
         function_name: 'sony_pmax_fetch_listing_groups'
         zip_file: 'high_perf_pmax.zip'
-        handler_name: 'lambda_main_pmax.lambda_handler'
+        handler: 'lambda_main_pmax.lambda_handler'
 # low-perf pmax deployment
   deploy-low-perf-pmax:
     runs-on: ubuntu-latest
@@ -72,4 +72,4 @@ jobs:
         aws_region: 'us-west-1' 
         function_name: 'sony_pmax_fetch_listing_groups_low_performing'
         zip_file: 'low_perf_pmax.zip'
-        handler_name: 'lambda_low_performing_pmax.lambda_handler' 
+        handler: 'lambda_low_performing_pmax.lambda_handler' 

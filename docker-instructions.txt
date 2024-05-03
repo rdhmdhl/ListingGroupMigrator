@@ -1,0 +1,14 @@
+build the docker image:
+docker build -t my-python-app-311 .
+
+## Extract the zipped file:
+# Start the container
+# might get an error for "platform does not match detected host", which is fine.
+docker run -d --name my-running-app-311 my-python-app-311
+
+# Copy the zipped file from the container to your local machine
+docker cp my-running-app-311:/app/lambda-layer.zip ~/Documents/
+
+# Stop and remove the container
+docker stop my-running-app-311
+docker rm my-running-app-311
