@@ -13,4 +13,4 @@ def lambda_handler(event, context):
     to_emails = os.getenv("TO_EMAIL_ADDRESSES")
     fetch_listing_groups_normal(client, customer_id, to_emails)
 
-lambda_handler(None, None)
+# lambda_handler(None, None)
