@@ -5,7 +5,7 @@ from common.initialize_google_ads_client import initialize_google_ads_client as 
 import os
 from dotenv import load_dotenv
 # load env variables
-load_dotenv()
+# load_dotenv()
 
 def lambda_handler(event, context):
     client = initialize_google_ads_client_main()
