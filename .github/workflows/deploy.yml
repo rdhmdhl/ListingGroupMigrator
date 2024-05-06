@@ -29,7 +29,7 @@ jobs:
 
     - name: Package high_perf_pmax Lambda function
       run: |
-        cp -r common/. high_perf_pmax/
+        cp -r common/ high_perf_pmax/
         cd high_perf_pmax
         zip -r ../high_perf_pmax.zip . -x "*.pyc" -x "__pycache__/*"
 
