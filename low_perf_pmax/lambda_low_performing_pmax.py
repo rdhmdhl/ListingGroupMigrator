@@ -1,13 +1,13 @@
-import sys
-# used for local testing
-# sys.path.append('/Users/reidhommedahl/github/lambda_layer/python/')
-import json
-from fetch_listing_groups_low_performing import fetch_existing_listing_groups as fetch_listing_groups_low_performing
-from common.initialize_google_ads_client import initialize_google_ads_client as initialize_google_ads_client_main
-import os
+# UNCOMMENT FOR TESTING ENVIRONMENT
+# import sys
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # from dotenv import load_dotenv
 # load env variables
 # load_dotenv()
+
+import os
+from fetch_listing_groups_low_performing import fetch_existing_listing_groups as fetch_listing_groups_low_performing
+from common.initialize_google_ads_client import initialize_google_ads_client as initialize_google_ads_client_main
 
 def lambda_handler(event, context):
     try:
@@ -25,4 +25,4 @@ def lambda_handler(event, context):
     except Exception as e:
         return {"error": str(e), "status": "Failed"}
 
-lambda_handler(None, None)
+# lambda_handler(None, None)

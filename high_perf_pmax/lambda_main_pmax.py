@@ -1,16 +1,27 @@
+# UNCOMMENT FOR TESTING ENVIRONMENT
 # import sys
-# import json
-from fetch_listing_groups_normal_pmax import fetch_existing_listing_groups as fetch_listing_groups_normal
-from common.initialize_google_ads_client import initialize_google_ads_client as initialize_google_ads_client_main
-import os
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # from dotenv import load_dotenv
 # load env variables
 # load_dotenv()
 
+import os
+from fetch_listing_groups_normal_pmax import fetch_existing_listing_groups as fetch_listing_groups_normal
+from common.initialize_google_ads_client import initialize_google_ads_client as initialize_google_ads_client_main
+
 def lambda_handler(event, context):
-    client = initialize_google_ads_client_main()
-    customer_id = os.getenv("CID")
-    to_emails = os.getenv("TO_EMAIL_ADDRESSES")
-    fetch_listing_groups_normal(client, customer_id, to_emails)
+    try:
+        client = initialize_google_ads_client_main()
+        customer_id = os.getenv("CID")
+        if not customer_id: 
+            raise ValueError("Customer ID not set in environment variables")
+        to_emails = os.getenv("TO_EMAIL_ADDRESSES")
+        if not to_emails:
+            raise ValueError("To email addresses not set in environement variables")
+        
+        fetch_listing_groups_normal(client, customer_id, to_emails)
+        return {"status": "Success"}
+    except Exception as e: 
+        return {"error": str(e), "status": "Failed"}
 
 # lambda_handler(None, None)
