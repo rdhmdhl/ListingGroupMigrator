@@ -41,7 +41,7 @@ def exclude_listing_group(client, customer_id, campaign_id, product_id, generic_
         
         create.asset_group = asset_group_resource_name_to_exclude
         # always shopping for pmax retail
-        create.vertical = "SHOPPING"
+        create.listing_source = "SHOPPING"
         # determine what value to filter on, using product item ID here
         # this is what we want to exclude, based on ROAS
         create.case_value.product_item_id.value = product_id

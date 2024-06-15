@@ -53,7 +53,7 @@ def include_listing_group(client, customer_id, campaign_id, product_id, generic_
         create = create_operation.asset_group_listing_group_filter_operation.create
         create.type_ = client.enums.ListingGroupFilterTypeEnum.UNIT_INCLUDED
         create.asset_group = asset_group_resource_name_to_include
-        create.vertical = "SHOPPING"
+        create.listing_source = "SHOPPING"
         create.case_value.product_item_id.value = product_id
         create.parent_listing_group_filter = parent_listing_group_filter_resource_name
         operations.append(create_operation)
